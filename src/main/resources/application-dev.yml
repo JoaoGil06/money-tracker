@@ -1,0 +1,21 @@
+spring:
+  docker:
+    compose:
+      lifecycle-management: start-only
+  devtools:
+    livereload:
+      enabled: false   # API only, no server-side templates
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+
+management:
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.flywaydb: info
