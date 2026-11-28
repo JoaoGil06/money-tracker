@@ -22,4 +22,27 @@ class BCryptPasswordHasherTest {
         var seventyTwoCharsButMoreBytes = "é".repeat(72);   // 144 UTF-8 bytes
         assertThatThrownBy(() -> hasher.hash(seventyTwoCharsButMoreBytes)).isInstanceOf(ValidationException.class);
     }
+
+    @Test
+    void matchesTheCorrectPassword() {
+        var hash = hasher.hash("s3cret-pass");
+        assertThat(hasher.matches("s3cret-pass", hash)).isTrue();
+    }
+
+    @Test
+    void doesNotMatchAWrongPassword() {
+        var hash = hasher.hash("s3cret-pass");
+        assertThat(hasher.matches("wrong-pass", hash)).isFalse();
+    }
+
+    @Test
+    void unknownUserNullHashNeverMatches() {
+        assertThat(hasher.matches("s3cret-pass", null)).isFalse();
+    }
+
+    @Test
+    void overlongPasswordOnLoginReturnsFalseInsteadOfThrowing() {
+        var hash = hasher.hash("s3cret-pass");
+        assertThat(hasher.matches("é".repeat(72), hash)).isFalse();
+    }
 }

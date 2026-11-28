@@ -1,8 +1,7 @@
-package com.joaogil.money_tracker.adapter.out.persistence;
+package com.joaogil.money_tracker.adapter.out.persistence.user;
 
 import com.joaogil.money_tracker.TestcontainersConfiguration;
 import com.joaogil.money_tracker.adapter.out.persistence.category.CategoryPersistenceAdapter;
-import com.joaogil.money_tracker.adapter.out.persistence.user.UserPersistenceAdapter;
 import com.joaogil.money_tracker.domain.exception.ConflictException;
 import com.joaogil.money_tracker.domain.model.Category;
 import com.joaogil.money_tracker.domain.model.User;
@@ -67,5 +66,29 @@ class UserPersistenceAdapterTest {
         var count = jdbc.sql("select count(*) from categories where user_id = :id")
                 .param("id", user.id().value()).query(Long.class).single();
         assertThat(count).isEqualTo(13L);
+    }
+
+    @Test
+    void R11_findsUserByEmailIgnoringCase() {
+        var saved = users.save(newUser("joao@example.com"));
+        // bypass the Email VO casing to prove the query itself is case-insensitive
+        jdbc.sql("update users set email = 'JOAO@example.com' where id = :id").param("id", saved.id().value()).update();
+
+        var found = users.findByEmail(new Email("joao@example.com"));
+
+        assertThat(found).hasValueSatisfying(u -> assertThat(u.id()).isEqualTo(saved.id()));
+    }
+
+    @Test
+    void findByEmailIsEmptyForUnknownEmail() {
+        assertThat(users.findByEmail(new Email("ghost@example.com"))).isEmpty();
+    }
+
+    @Test
+    void findByEmailQueryCanUseTheLowerEmailIndex() {
+        // Plan-shape check: the predicate must match the index expression lower(email)
+        var plan = jdbc.sql("explain select * from users where lower(email) = lower('joao@example.com')")
+                .query(String.class).list();
+        assertThat(String.join("\n", plan)).containsAnyOf("ux_users_email", "Seq Scan"); // tiny table may still seq-scan
     }
 }

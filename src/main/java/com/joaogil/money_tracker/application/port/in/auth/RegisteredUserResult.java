@@ -1,4 +1,4 @@
-package com.joaogil.money_tracker.application.port.in;
+package com.joaogil.money_tracker.application.port.in.auth;
 
 import java.time.Instant;
 import java.util.UUID;

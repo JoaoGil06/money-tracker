@@ -4,13 +4,12 @@ import com.joaogil.money_tracker.domain.model.CategoryType;
 import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
-import org.springframework.data.domain.Persistable;
 
 import java.util.UUID;
 
 @Entity
 @Table(name = "categories")
-public class CategoryJpaEntity implements Persistable<UUID> {
+public class CategoryJpaEntity {
     @Id
     private UUID id;
 
@@ -30,8 +29,6 @@ public class CategoryJpaEntity implements Persistable<UUID> {
     @Column(name = "is_archived", nullable = false)
     private boolean archived;
 
-    @Transient private boolean isNew = true;
-
     protected CategoryJpaEntity() {}
 
     public CategoryJpaEntity(UUID id, UUID userId, String name, CategoryType type, String color, boolean archived) {
@@ -43,18 +40,8 @@ public class CategoryJpaEntity implements Persistable<UUID> {
         this.archived = archived;
     }
 
-    @PostPersist
-    @PostLoad
-    void markNotNew() {
-        this.isNew = false;
-    }
-
-    @Override public UUID getId() {
+    public UUID getId() {
         return id;
-    }
-
-    @Override public boolean isNew() {
-        return isNew;
     }
 
     public String getName() {
