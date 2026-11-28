@@ -1,16 +1,16 @@
-package com.joaogil.money_tracker.application.service;
+package com.joaogil.money_tracker.application.service.auth;
 
-import com.joaogil.money_tracker.application.port.in.RegisterUser;
-import com.joaogil.money_tracker.application.port.in.RegisterUserCommand;
-import com.joaogil.money_tracker.application.port.in.RegisteredUserResult;
-import com.joaogil.money_tracker.application.port.out.CategoryRepository;
-import com.joaogil.money_tracker.application.port.out.PasswordHasher;
-import com.joaogil.money_tracker.application.port.out.UserRepository;
+import com.joaogil.money_tracker.application.port.in.auth.RegisterUser;
+import com.joaogil.money_tracker.application.port.in.auth.RegisterUserCommand;
+import com.joaogil.money_tracker.application.port.in.auth.RegisteredUserResult;
+import com.joaogil.money_tracker.application.port.out.persistence.CategoryRepository;
+import com.joaogil.money_tracker.application.port.out.auth.PasswordHasher;
+import com.joaogil.money_tracker.application.port.out.persistence.UserRepository;
 import com.joaogil.money_tracker.domain.exception.ConflictException;
 import com.joaogil.money_tracker.domain.model.Category;
 import com.joaogil.money_tracker.domain.model.User;
 import com.joaogil.money_tracker.domain.vo.Email;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.Clock;

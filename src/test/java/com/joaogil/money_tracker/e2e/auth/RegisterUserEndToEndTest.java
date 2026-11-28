@@ -1,4 +1,6 @@
-package com.joaogil.money_tracker;
+package com.joaogil.money_tracker.e2e.auth;
+
+import com.joaogil.money_tracker.TestcontainersConfiguration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

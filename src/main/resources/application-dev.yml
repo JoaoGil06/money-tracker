@@ -10,6 +10,10 @@ spring:
       hibernate:
         format_sql: true
 
+app:
+  jwt:
+    secret: lATZQiOL4f8rIIq1ry+8wkatxMF0eN6br95/XcixpAw=   # dev only — prod uses JWT_SECRET
+
 management:
   endpoint:
     health:

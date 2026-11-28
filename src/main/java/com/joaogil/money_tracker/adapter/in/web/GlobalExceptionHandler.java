@@ -1,6 +1,7 @@
 package com.joaogil.money_tracker.adapter.in.web;
 
 import com.joaogil.money_tracker.domain.exception.ConflictException;
+import com.joaogil.money_tracker.domain.exception.InvalidCredentialsException;
 import com.joaogil.money_tracker.domain.exception.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,5 +46,10 @@ class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     ProblemDetail handleUnexpected(Exception ex) {
         log.error("Unhandled exception", ex);
         return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error");
+    }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    ProblemDetail handleInvalidCredentials(InvalidCredentialsException ex) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, ex.getMessage());
     }
 }

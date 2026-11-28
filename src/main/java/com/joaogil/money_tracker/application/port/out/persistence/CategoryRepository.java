@@ -1,4 +1,4 @@
-package com.joaogil.money_tracker.application.port.out;
+package com.joaogil.money_tracker.application.port.out.persistence;
 
 import com.joaogil.money_tracker.domain.model.Category;
 

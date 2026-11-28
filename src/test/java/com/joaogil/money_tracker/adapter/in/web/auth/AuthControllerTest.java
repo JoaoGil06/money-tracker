@@ -1,10 +1,12 @@
-package com.joaogil.money_tracker.adapter.in.web;
+package com.joaogil.money_tracker.adapter.in.web.auth;
 
-import com.joaogil.money_tracker.adapter.in.web.auth.AuthController;
-import com.joaogil.money_tracker.application.port.in.RegisterUser;
-import com.joaogil.money_tracker.application.port.in.RegisteredUserResult;
+import com.joaogil.money_tracker.application.port.in.auth.LoginResult;
+import com.joaogil.money_tracker.application.port.in.auth.LoginUser;
+import com.joaogil.money_tracker.application.port.in.auth.RegisterUser;
+import com.joaogil.money_tracker.application.port.in.auth.RegisteredUserResult;
 import com.joaogil.money_tracker.config.SecurityConfig;
 import com.joaogil.money_tracker.domain.exception.ConflictException;
+import com.joaogil.money_tracker.domain.exception.InvalidCredentialsException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -28,9 +30,14 @@ class AuthControllerTest {
 
     @Autowired MockMvc mvc;
     @MockitoBean RegisterUser registerUser;
+    @MockitoBean
+    LoginUser loginUser;
 
     private static final String VALID = """
             {"name":"João","email":"joao@example.com","password":"s3cret-pass"}""";
+
+    private static final String LOGIN = """
+        {"email":"joao@example.com","password":"s3cret-pass"}""";
 
     @Test
     void returns201WithLocationAndBody() throws Exception {
@@ -82,5 +89,42 @@ class AuthControllerTest {
     @Test
     void registerIsPublicButOtherApiRoutesRequireAuthentication() throws Exception {
         mvc.perform(get("/api/accounts")).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void loginReturns200WithAccessTokenAndExpiresIn() throws Exception {
+        given(loginUser.login(any())).willReturn(new LoginResult("jwt-value", 3600));
+
+        mvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON).content(LOGIN))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").value("jwt-value"))
+                .andExpect(jsonPath("$.expiresIn").value(3600));
+    }
+
+    @Test
+    void loginWithBadCredentialsReturns401ProblemDetail() throws Exception {
+        given(loginUser.login(any())).willThrow(new InvalidCredentialsException());
+
+        mvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON).content(LOGIN))
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.detail").value("invalid email or password"));
+    }
+
+    @Test
+    void loginWithInvalidBodyReturns400WithErrorsMap() throws Exception {
+        mvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                            {"email":"not-an-email","password":""}"""))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.email").exists())
+                .andExpect(jsonPath("$.errors.password").exists());
+    }
+
+    @Test
+    void loginIsPublic() throws Exception {
+        given(loginUser.login(any())).willReturn(new LoginResult("jwt-value", 3600));
+        mvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON).content(LOGIN))
+                .andExpect(status().isOk());   // no Authorization header needed
     }
 }

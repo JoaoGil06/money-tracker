@@ -1,6 +1,6 @@
-package com.joaogil.money_tracker.application.service;
+package com.joaogil.money_tracker.application.service.auth;
 
-import com.joaogil.money_tracker.application.port.in.RegisterUserCommand;
+import com.joaogil.money_tracker.application.port.in.auth.RegisterUserCommand;
 import com.joaogil.money_tracker.application.service.fakes.FakePasswordHasher;
 import com.joaogil.money_tracker.application.service.fakes.InMemoryCategoryRepository;
 import com.joaogil.money_tracker.application.service.fakes.InMemoryUserRepository;

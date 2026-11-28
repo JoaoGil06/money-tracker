@@ -1,9 +1,13 @@
 package com.joaogil.money_tracker.adapter.in.web.auth;
 
-import com.joaogil.money_tracker.adapter.in.web.auth.dtos.RegisterUserRequest;
-import com.joaogil.money_tracker.adapter.in.web.auth.dtos.RegisterUserResponse;
-import com.joaogil.money_tracker.application.port.in.RegisterUser;
-import com.joaogil.money_tracker.application.port.in.RegisterUserCommand;
+import com.joaogil.money_tracker.adapter.in.web.auth.dtos.LoginRequestDto;
+import com.joaogil.money_tracker.adapter.in.web.auth.dtos.LoginResponseDto;
+import com.joaogil.money_tracker.adapter.in.web.auth.dtos.RegisterUserRequestDto;
+import com.joaogil.money_tracker.adapter.in.web.auth.dtos.RegisterUserResponseDto;
+import com.joaogil.money_tracker.application.port.in.auth.LoginUser;
+import com.joaogil.money_tracker.application.port.in.auth.LoginUserCommand;
+import com.joaogil.money_tracker.application.port.in.auth.RegisterUser;
+import com.joaogil.money_tracker.application.port.in.auth.RegisterUserCommand;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,19 +21,30 @@ import java.net.URI;
 @RequestMapping("/api/auth")
 public class AuthController {
     private final RegisterUser registerUser;
+    private final LoginUser loginUser;
 
-    AuthController(RegisterUser registerUser) {
+    AuthController(RegisterUser registerUser, LoginUser loginUser) {
         this.registerUser = registerUser;
+        this.loginUser = loginUser;
     }
 
     @PostMapping("/register")
-    ResponseEntity<RegisterUserResponse> register(@Valid @RequestBody RegisterUserRequest request) {
+    ResponseEntity<RegisterUserResponseDto> register(@Valid @RequestBody RegisterUserRequestDto request) {
         RegisterUserCommand command = new RegisterUserCommand(request.name(), request.email(), request.password());
         var result = registerUser.register(command);
 
-        RegisterUserResponse responseDTO = new RegisterUserResponse(result.id(), result.name(), result.email(), result.createdAt());
+        RegisterUserResponseDto responseDTO = new RegisterUserResponseDto(result.id(), result.name(), result.email(), result.createdAt());
         return ResponseEntity
                 .created(URI.create("/api/me"))
                 .body(responseDTO);
+    }
+
+    @PostMapping("/login")
+    LoginResponseDto login(@Valid @RequestBody LoginRequestDto request) {
+        LoginUserCommand command = new LoginUserCommand(request.email(), request.password());
+        var result = loginUser.login(command);
+
+
+        return new LoginResponseDto(result.accessToken(), result.expiresInSeconds());
     }
 }

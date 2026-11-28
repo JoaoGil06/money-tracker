@@ -1,4 +1,4 @@
-package com.joaogil.money_tracker.application.port.in;
+package com.joaogil.money_tracker.application.port.in.auth;
 
 public record RegisterUserCommand(String name, String email, String password) {
     @Override public String toString() {

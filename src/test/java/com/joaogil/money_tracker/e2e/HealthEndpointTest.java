@@ -1,4 +1,6 @@
-package com.joaogil.money_tracker;
+package com.joaogil.money_tracker.e2e;
+
+import com.joaogil.money_tracker.TestcontainersConfiguration;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;

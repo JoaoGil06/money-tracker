@@ -35,6 +35,13 @@ class ArchitectureTest {
             .should().resideInAPackage("..adapter.out.persistence..");
 
     @ArchTest
+    static final ArchRule persistence_uses_plain_jpa = noClasses()
+            .should().dependOnClassesThat().resideInAnyPackage(
+                    "org.springframework.data.repository..", "org.springframework.data.jpa.repository..",
+                    "org.springframework.data.domain..")
+            .because("persistence adapters use the EntityManager directly, not Spring Data repositories");
+
+    @ArchTest
     static final ArchRule layers = layeredArchitecture().consideringOnlyDependenciesInLayers()
             .layer("Domain").definedBy("..domain..")
             .layer("Application").definedBy("..application..")

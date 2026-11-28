@@ -1,6 +1,6 @@
 package com.joaogil.money_tracker.application.service.fakes;
 
-import com.joaogil.money_tracker.application.port.out.CategoryRepository;
+import com.joaogil.money_tracker.application.port.out.persistence.CategoryRepository;
 import com.joaogil.money_tracker.domain.model.Category;
 
 import java.util.ArrayList;
